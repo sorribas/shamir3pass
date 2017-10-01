@@ -11,12 +11,12 @@ type Key struct {
 	Prime      *big.Int
 }
 
-func GenerateKey(prime *big.Int) Key {
+func GenerateKeyFromPrime(prime *big.Int) Key {
 	if prime == nil {
 		prime = Random1024BitPrime()
 	}
 	for {
-		n := random2048()
+		n := randomBigInt(len(prime.Bytes()) * 8)
 		primeMinusOne := &big.Int{}
 		primeMinusOne.Sub(prime, big.NewInt(1))
 		gcd := &big.Int{}
@@ -31,6 +31,11 @@ func GenerateKey(prime *big.Int) Key {
 			}
 		}
 	}
+}
+
+func GenerateKey(size int) Key {
+	prime := RandomNBitPrime(size)
+	return GenerateKeyFromPrime(prime)
 }
 
 func random2048() *big.Int {
@@ -50,8 +55,28 @@ func random2048() *big.Int {
 	return random
 }
 
+func randomBigInt(n int) *big.Int {
+	twoToThe47th := &big.Int{}
+	twoToThe47th.Exp(big.NewInt(2), big.NewInt(int64(n-1)), nil)
+
+	size := &big.Int{}
+	size.Exp(big.NewInt(2), big.NewInt(int64(n)), nil)
+	size.Sub(size, big.NewInt(1))
+	size.Sub(size, twoToThe47th)
+	random, err := rand.Int(rand.Reader, size)
+	if err != nil {
+		panic(err)
+	}
+	random.Add(random, twoToThe47th)
+	return random
+}
+
 func Random1024BitPrime() *big.Int {
-	prime, err := rand.Prime(rand.Reader, 1024)
+	return RandomNBitPrime(1024)
+}
+
+func RandomNBitPrime(n int) *big.Int {
+	prime, err := rand.Prime(rand.Reader, n)
 	if err != nil {
 		panic(err)
 	}

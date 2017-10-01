@@ -35,7 +35,7 @@ import (
 func main() {
 	message := []byte("Hello world!")
 
-	key := shamir3pass.GenerateKey(nil) // Generate a key based on a random prime
+	key := shamir3pass.GenerateKey(1024) // Generate a key based on a random prime
 	messageBigInt := &big.Int{}
 	messageBigInt.SetBytes(message) // Converting the message bytes in to a big int
 
@@ -60,10 +60,10 @@ import (
 func main() {
 	message := []byte("Hello world!")
 
-	prime := shamir3pass.Random1024BitPrime()
+	prime := shamir3pass.RandomNBitPrime(1024)
 
-	key1 := shamir3pass.GenerateKey(prime)
-	key2 := shamir3pass.GenerateKey(prime)
+	key1 := shamir3pass.GenerateKeyFromPrime(prime)
+	key2 := shamir3pass.GenerateKeyFromPrime(prime)
 	messageBigInt := &big.Int{}
 	messageBigInt.SetBytes(message)
 
